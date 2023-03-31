@@ -237,3 +237,25 @@ func parseKey(key string) (byte, byte, error) {
 
 	return buf1, buf2, nil
 }
+
+func getMediaKey(key string) (byte, error) {
+	// layerが違うとコードも違うみたいなのでlayer supportを追加する時は注意
+	var code byte
+	switch key {
+	case "play":
+		code = 0xcd
+	case "prev":
+		code = 0xb6
+	case "next":
+		code = 0xb5
+	case "mute":
+		code = 0xe2
+	case "volup":
+		code = 0xe9
+	case "voldown":
+		code = 0xea
+	default:
+		return 0, fmt.Errorf("unknown media key: %s", key)
+	}
+	return code, nil
+}

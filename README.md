@@ -23,15 +23,15 @@ windows 以外で設定することを目的としていますが、windows で�
 利用できるキーに関しては[keys.go](./keys.go)を参照。
 利用できるボタンに関しては[buttons.go](./buttons.go)を参照。
 
-> 備考：modifier を設定できるのは一番最初のキーのみです。（おそらく HW 製薬）
+> 備考：modifier を設定できるのは一番最初のキーのみです。
 
 ```
 > sudo ./chinese-mini-keyboard key KEY1 ctrl+c
 > sudo ./chinese-mini-keyboard key KEY2 ctrl+v
 > sudo ./chinese-mini-keyboard key KEY3 ctrl+t a // ctrl+t → a (ctrl+t → ctrl+a とはならない)
-> sudo ./chinese-mini-keyboard key K1_LEFT volumeadd // つまみ左
-> sudo ./chinese-mini-keyboard key K1_CENTER mute // つまみ押
-> sudo ./chinese-mini-keyboard key K1_RIGHT volumesub // つまみ右
+> sudo ./chinese-mini-keyboard mediakey K1_LEFT voldown // つまみ左
+> sudo ./chinese-mini-keyboard mediakey K1_CENTER mute // つまみ押
+> sudo ./chinese-mini-keyboard mediakey K1_RIGHT voladd // つまみ右
 ```
 
 ### LED のモードを変更する

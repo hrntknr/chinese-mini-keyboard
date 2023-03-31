@@ -31,16 +31,22 @@ func getButtonCode(button string) (byte, error) {
 		key = 0x0c
 	case "K1_LEFT":
 		key = 0x0d
-	case "K1_RIGHT":
+	case "K1_CENTER":
 		key = 0x0e
-	case "K2_LEFT":
+	case "K1_RIGHT":
 		key = 0x0f
-	case "K2_RIGHT":
+	case "K2_LEFT":
 		key = 0x10
-	case "K3_LEFT":
+	case "K2_CENTER":
 		key = 0x11
-	case "K3_RIGHT":
+	case "K2_RIGHT":
 		key = 0x12
+	case "K3_LEFT":
+		key = 0x13
+	case "K3_CENTER":
+		key = 0x14
+	case "K3_RIGHT":
+		key = 0x15
 	default:
 		return 0, errors.New("invalid button")
 	}
