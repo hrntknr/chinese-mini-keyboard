@@ -24,7 +24,7 @@ func parseKey(key string) (byte, byte, error) {
 
 	keys := strings.Split(key, "+")
 	if len(keys) != 1 {
-		for _, k := range keys[:1] {
+		for _, k := range keys[:len(keys)-1] {
 			switch k {
 			case "ctrl":
 				buf1 |= 0x01
