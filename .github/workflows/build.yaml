@@ -1,0 +1,43 @@
+name: build
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    name: build binary
+    permissions: write-all
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux
+            GOARCH: amd64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux
+            GOARCH: arm64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            GOARCH: amd64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            GOARCH: arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20
+
+      - name: Build binary
+        run: |
+          go build -o chinese-mini-keyboard-${{ matrix.target }} -ldflags "-s -w"
+        env:
+          GOARCH: ${{ matrix.GOARCH }}
