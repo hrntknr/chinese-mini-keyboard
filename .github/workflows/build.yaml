@@ -15,17 +15,19 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            target: x86_64-unknown-linux
-            GOARCH: amd64
+            name: chinese-mini-keyboard-x86_64-unknown-linux
           - os: ubuntu-latest
-            target: aarch64-unknown-linux
-            GOARCH: arm64
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            GOARCH: amd64
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            GOARCH: arm64
+            osxcross: true
+            platform: arm64-apple-darwin20.4
+            sdk_version: 11.3
+            name: chinese-mini-keyboard-arm64-apple-darwin
+          - os: ubuntu-latest
+            osxcross: true
+            platform: x86_64-apple-darwin20.4
+            sdk_version: 11.3
+            name: chinese-mini-keyboard-x86_64-apple-darwin
+          - os: windows-latest
+            name: chinese-mini-keyboard-x86_64-unknown-windows.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -34,7 +36,37 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: "1.20"
+      - run: sudo apt-get install -y libusb-1.0-0-dev
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - uses: msys2/setup-msys2@v2
+        with:
+          location: C:/mingw
+          update: true
+          install: >-
+            mingw-w64-x86_64-libusb
+        if: ${{ matrix.os == 'windows-latest' }}
       - run: |
-          go build -o chinese-mini-keyboard-${{ matrix.target }} -ldflags "-s -w"
+          echo 'PKG_CONFIG_PATH=C:/mingw/msys64/mingw64/lib/pkgconfig' >> $env:GITHUB_ENV
+          echo 'CGO_CFLAGS=-IC:/mingw/msys64/mingw64/include/libusb-1.0' >> $env:GITHUB_ENV
+          echo 'CGO_LDFLAGS="-Wl,-dn,-LC:/mingw/msys64/mingw64/lib"' >> $env:GITHUB_ENV
+        if: ${{ matrix.os == 'windows-latest' }}
+      - run: ./osxcross.sh
         env:
-          GOARCH: ${{ matrix.GOARCH }}
+          PLATFORM: ${{ matrix.platform }}
+          SDK_VERSION: ${{ matrix.sdk_version }}
+        if: ${{ matrix.osxcross }}
+      - uses: actions/cache@v2
+        with:
+          path: oscross
+          key: oscross-${{ matrix.platform }}-${{ matrix.sdk_version }}-${{ hashFiles('osxcross.sh') }}
+        if: ${{ matrix.osxcross }}
+      - run: ./osxcross/env.sh
+        if: ${{ matrix.osxcross }}
+      - run: go build -o ${{ matrix.name }} -ldflags "-s -w"
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ${{ matrix.name }}
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ matrix.name }}
