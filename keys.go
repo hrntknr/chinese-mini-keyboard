@@ -238,8 +238,7 @@ func parseKey(key string) (byte, byte, error) {
 	return buf1, buf2, nil
 }
 
-func getMediaKey(key string) (byte, error) {
-	// layerが違うとコードも違うみたいなのでlayer supportを追加する時は注意
+func parseMediaKey(key string) (byte, error) {
 	var code byte
 	switch key {
 	case "play":
@@ -258,4 +257,43 @@ func getMediaKey(key string) (byte, error) {
 		return 0, fmt.Errorf("unknown media key: %s", key)
 	}
 	return code, nil
+}
+
+func parseMouseKey(key string) (byte, byte, byte, error) {
+	var buf1, buf2, buf3 byte
+
+	keys := strings.Split(key, "+")
+	if len(keys) != 1 {
+		for _, k := range keys[:len(keys)-1] {
+			switch k {
+			case "ctrl":
+				buf1 |= 0x01
+			case "shift":
+				buf1 |= 0x02
+			case "alt":
+				buf1 |= 0x04
+			case "gui":
+				buf1 |= 0x08
+			default:
+				return 0, 0, 0, errors.Errorf("unknown key: %s", k)
+			}
+		}
+	}
+
+	switch keys[len(keys)-1] {
+	case "leftclick":
+		buf2 = 0x01
+	case "rightclick":
+		buf2 = 0x02
+	case "centerclick":
+		buf2 = 0x04
+	case "wheelup":
+		buf3 = 0x01
+	case "wheeldown":
+		buf3 = 0xff
+	default:
+		return 0, 0, 0, fmt.Errorf("unknown mouse key: %s", key)
+	}
+
+	return buf1, buf2, buf3, nil
 }

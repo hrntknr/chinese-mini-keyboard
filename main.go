@@ -53,6 +53,15 @@ func main() {
 			}
 		},
 	}
+	var mousekey = &cobra.Command{
+		Use:   "mousekey",
+		Short: "set mouse key to button",
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := setMouseKey(args); err != nil {
+				log.Fatal(fmt.Sprintf("%+v", err))
+			}
+		},
+	}
 	var led = &cobra.Command{
 		Use:   "led",
 		Short: "set led mode",
@@ -64,6 +73,7 @@ func main() {
 	}
 	rootCmd.AddCommand(key)
 	rootCmd.AddCommand(mediakey)
+	rootCmd.AddCommand(mousekey)
 	rootCmd.AddCommand(led)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(fmt.Sprintf("%+v", err))
@@ -124,9 +134,9 @@ func setMediaKey(args []string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get button code")
 	}
-	key, err := getMediaKey(args[1])
+	key, err := parseMediaKey(args[1])
 	if err != nil {
-		return errors.Wrap(err, "failed to get media key")
+		return errors.Wrap(err, "failed to parse media key")
 	}
 
 	ep, err := initUsb(0x1189, 0x8890)
@@ -138,6 +148,37 @@ func setMediaKey(args []string) error {
 		return errors.Wrap(err, "failed to send code")
 	}
 	if err := sendCode(ep, []byte{0x03, button, 0x12, key}); err != nil {
+		return errors.Wrap(err, "failed to send code")
+	}
+	if err := sendCode(ep, []byte{0x03, 0xaa, 0xaa}); err != nil {
+		return errors.Wrap(err, "failed to send code")
+	}
+
+	return nil
+}
+
+func setMouseKey(args []string) error {
+	if len(args) != 2 {
+		return errors.New("invalid args")
+	}
+	button, err := getButtonCode(args[0])
+	if err != nil {
+		return errors.Wrap(err, "failed to get button code")
+	}
+	modifier, click, wheel, err := parseMouseKey(args[1])
+	if err != nil {
+		return errors.Wrap(err, "failed to parse mouse key")
+	}
+
+	ep, err := initUsb(0x1189, 0x8890)
+	if err != nil {
+		return errors.Wrap(err, "failed to init usb")
+	}
+
+	if err := sendCode(ep, []byte{0x03, 0xa1, 0x01}); err != nil {
+		return errors.Wrap(err, "failed to send code")
+	}
+	if err := sendCode(ep, []byte{0x03, button, 0x13, click, 0x00, 0x00, wheel, modifier}); err != nil {
 		return errors.Wrap(err, "failed to send code")
 	}
 	if err := sendCode(ep, []byte{0x03, 0xaa, 0xaa}); err != nil {
