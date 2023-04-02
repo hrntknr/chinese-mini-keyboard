@@ -12,9 +12,12 @@ arm64*)
   ;;
 esac
 
-git clone https://github.com/tpoechtrager/osxcross.git
+if [ ! -e osxcross ]; then
+  git clone https://github.com/tpoechtrager/osxcross.git
+fi
 (
   cd osxcross
+  git pull
   OSXCROSS=$(pwd)
 
   sudo ./tools/get_dependencies.sh
@@ -39,17 +42,13 @@ git clone https://github.com/tpoechtrager/osxcross.git
   export GOOS="darwin"
   export GOARCH="$GOARCH"
 
-  if [ -e env.sh ]; then
-    rm env.sh
-  fi
-  echo "echo 'PATH=$PATH' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'OSXCROSS_MP_INC=$OSXCROSS_MP_INC' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'CC=$CC' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'CXX=$CXX' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'AR=$AR' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'LD=$LD' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'CGO_ENABLED=$CGO_ENABLED' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'GOOS=$GOOS' >>\$GITHUB_ENV" >>env.sh
-  echo "echo 'GOARCH=$GOARCH' >>\$GITHUB_ENV" >>env.sh
-  chmod +x env.sh
+  echo PATH=$OSXCROSS/target/bin:$PATH >>$GITHUB_ENV
+  echo OSXCROSS_MP_INC=$OSXCROSS_MP_INC >>$GITHUB_ENV
+  echo CC=$CC >>$GITHUB_ENV
+  echo CXX=$CXX >>$GITHUB_ENV
+  echo AR=$AR >>$GITHUB_ENV
+  echo LD=$LD >>$GITHUB_ENV
+  echo CGO_ENABLED=$CGO_ENABLED >>$GITHUB_ENV
+  echo GOOS=$GOOS >>$GITHUB_ENV
+  echo GOARCH=$GOARCH >>$GITHUB_ENV
 )
