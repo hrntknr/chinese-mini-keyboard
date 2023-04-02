@@ -8,7 +8,9 @@ fi
   cd sigtool
   git pull
   SIGTOOL=$(pwd)
-  mkdir build
+  if [ ! -e build ]; then
+    mkdir build
+  fi
   (
     cd build
     cmake ..
