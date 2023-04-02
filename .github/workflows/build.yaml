@@ -52,14 +52,14 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
       - uses: actions/cache@v3
         with:
-          path: sigtool
+          path: tools/sigtool
           key: sigtool-${{ hashFiles('tools/sigtool.sh') }}
         if: ${{ matrix.osxcross }}
       - run: ./tools/sigtool.sh
         if: ${{ matrix.osxcross }}
       - uses: actions/cache@v3
         with:
-          path: oscross
+          path: tools/oscross
           key: oscross-${{ matrix.platform }}-${{ matrix.sdk_version }}-${{ hashFiles('tools/osxcross.sh') }}
         if: ${{ matrix.osxcross }}
       - run: ./tools/osxcross.sh
