@@ -10,12 +10,17 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var log *zap.Logger
 
 func init() {
-	cfg := zap.NewDevelopmentConfig()
+	cfg := zap.NewProductionConfig()
+	cfg.Encoding = "console"
+	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	cfg.DisableStacktrace = true
 	switch strings.ToLower(os.Getenv("LOG_LEVEL")) {
 	case "debug":
 		cfg.Level.SetLevel(zap.DebugLevel)
@@ -25,14 +30,13 @@ func init() {
 		cfg.Level.SetLevel(zap.WarnLevel)
 	case "error":
 		cfg.Level.SetLevel(zap.ErrorLevel)
-	case "dpanic":
-		cfg.Level.SetLevel(zap.DPanicLevel)
-	case "panic":
-		cfg.Level.SetLevel(zap.PanicLevel)
+	case "":
+		cfg.Level.SetLevel(zap.InfoLevel)
+	default:
+		panic("invalid log level")
 	}
 	log, _ = cfg.Build()
 }
-
 func main() {
 	var rootCmd = &cobra.Command{Use: "app"}
 	var key = &cobra.Command{
@@ -40,7 +44,8 @@ func main() {
 		Short: "set key to button",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := setKey(args); err != nil {
-				log.Fatal(fmt.Sprintf("%+v", err))
+				log.Debug(fmt.Sprintf("%+v", err))
+				log.Error(fmt.Sprint(err))
 			}
 		},
 	}
@@ -49,7 +54,8 @@ func main() {
 		Short: "set media key to button",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := setMediaKey(args); err != nil {
-				log.Fatal(fmt.Sprintf("%+v", err))
+				log.Debug(fmt.Sprintf("%+v", err))
+				log.Error(fmt.Sprint(err))
 			}
 		},
 	}
@@ -58,7 +64,8 @@ func main() {
 		Short: "set mouse key to button",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := setMouseKey(args); err != nil {
-				log.Fatal(fmt.Sprintf("%+v", err))
+				log.Debug(fmt.Sprintf("%+v", err))
+				log.Error(fmt.Sprint(err))
 			}
 		},
 	}
@@ -67,7 +74,8 @@ func main() {
 		Short: "set led mode",
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := setLed(args); err != nil {
-				log.Fatal(fmt.Sprintf("%+v", err))
+				log.Debug(fmt.Sprintf("%+v", err))
+				log.Error(fmt.Sprint(err))
 			}
 		},
 	}
@@ -238,6 +246,9 @@ func initUsb(vid, pid gousb.ID) (*gousb.OutEndpoint, error) {
 	dev, err := ctx.OpenDeviceWithVIDPID(vid, pid)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open device")
+	}
+	if dev == nil {
+		return nil, errors.New("device not found")
 	}
 	defer dev.Close()
 
