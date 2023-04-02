@@ -50,7 +50,7 @@ jobs:
           echo 'CGO_CFLAGS=-IC:/mingw/msys64/mingw64/include/libusb-1.0' >> $env:GITHUB_ENV
           echo 'CGO_LDFLAGS="-Wl,-dn,-LC:/mingw/msys64/mingw64/lib"' >> $env:GITHUB_ENV
         if: ${{ matrix.os == 'windows-latest' }}
-      - run: ./osxcross.sh
+      - run: ./tools/osxcross.sh
         env:
           PLATFORM: ${{ matrix.platform }}
           SDK_VERSION: ${{ matrix.sdk_version }}
@@ -58,11 +58,22 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: oscross
-          key: oscross-${{ matrix.platform }}-${{ matrix.sdk_version }}-${{ hashFiles('osxcross.sh') }}
+          key: oscross-${{ matrix.platform }}-${{ matrix.sdk_version }}-${{ hashFiles('tools/osxcross.sh') }}
         if: ${{ matrix.osxcross }}
-      - run: ./osxcross/env.sh
+      - run: ./tools/sigtool.sh
+        if: ${{ matrix.osxcross }}
+      - uses: actions/cache@v2
+        with:
+          path: sigtool
+          key: sigtool-${{ hashFiles('tools/sigtool.sh') }}
+        if: ${{ matrix.osxcross }}
+      - run: ./osxcross/env.sh && ./sigtool/env.sh
         if: ${{ matrix.osxcross }}
       - run: go build -o ${{ matrix.name }} -ldflags "-s -w"
+      - run: ./tools/install_name_tool.sh
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        if: ${{ matrix.osxcross }}
       - uses: actions/upload-artifact@v3
         with:
           path: ${{ matrix.name }}
