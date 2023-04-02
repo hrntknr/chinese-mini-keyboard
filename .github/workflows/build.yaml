@@ -59,8 +59,8 @@ jobs:
         if: ${{ matrix.osxcross }}
       - uses: actions/cache@v3
         with:
-          path: tools/oscross
-          key: oscross-${{ matrix.platform }}-${{ matrix.sdk_version }}-${{ hashFiles('tools/osxcross.sh') }}
+          path: tools/osxcross
+          key: osxcross-${{ matrix.platform }}-${{ matrix.sdk_version }}-${{ hashFiles('tools/osxcross.sh') }}
         if: ${{ matrix.osxcross }}
       - run: ./tools/osxcross.sh
         env:
