@@ -17,6 +17,15 @@ linux/mac 上で動作します。
 
 ## 利用方法
 
+### 依存関係
+
+```
+# ubuntu
+sudo apt install libusb-1.0-0
+# macos
+brew install libusb
+```
+
 ### ショートカットを設定する
 
 #### 例
@@ -83,14 +92,14 @@ linux/mac 上で動作します。
 | KEY10     | キーボード１０       |
 | KEY11     | キーボード１１       |
 | KEY12     | キーボード１２       |
-| K1_Left   | スクロール１左回転   |
-| K1_Center | スクロール１右回転   |
+| K1_LEFT   | スクロール１左回転   |
+| K1_CENTER | スクロール１右回転   |
 | K1_RIGHT  | スクロール１押し込み |
-| K2_Left   | スクロール２左回転   |
-| K2_Center | スクロール２右回転   |
+| K2_LEFT   | スクロール２左回転   |
+| K2_CENTER | スクロール２右回転   |
 | K2_RIGHT  | スクロール２押し込み |
-| K3_Left   | スクロール３左回転   |
-| K3_Center | スクロール３右回転   |
+| K3_LEFT   | スクロール３左回転   |
+| K3_CENTER | スクロール３右回転   |
 | K3_RIGHT  | スクロール３押し込み |
 
 #### キー一覧
