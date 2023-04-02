@@ -26,8 +26,8 @@ jobs:
             platform: x86_64-apple-darwin20.4
             sdk_version: 11.3
             name: chinese-mini-keyboard-x86_64-apple-darwin
-          - os: windows-latest
-            name: chinese-mini-keyboard-x86_64-unknown-windows.exe
+          # - os: windows-latest
+          #   name: chinese-mini-keyboard-x86_64-unknown-windows.exe
 
     runs-on: ${{ matrix.os }}
 
